@@ -31,6 +31,9 @@ public class CarController : MonoBehaviour
   public TextMeshProUGUI timerText;
   public TextMeshProUGUI highScoreText;
 
+  //-- HomeScreen --
+  public GameObject homeScreenParent;
+
   //-- GameOver--
   public GameObject gameOverParent;
   public GameObject newHighScore;
@@ -41,14 +44,17 @@ public class CarController : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
+    Time.timeScale = 0;
+
     theRB.transform.parent = null;
     count = 0;
-    startTime = Time.time;
-    highScoreText.text = "HighScore: " + formatTime(PlayerPrefs.GetFloat("HighScore"));
+
+    highScoreText.text = "";
+    countText.text = "";
+    timerText.text = "";
+
     gameOverParent.SetActive(false);
     newHighScore.SetActive(false);
-
-    SetCountText();
   }
 
   // Update is called once per frame
@@ -128,7 +134,7 @@ public class CarController : MonoBehaviour
 
   void SetTimerText()
   {
-    if (gameFinished) return;
+    if (gameFinished || Time.timeScale == 0) return;
 
     timeSinceTimerStart = Time.time - startTime;
     timerText.text = formatTime(timeSinceTimerStart);
@@ -171,10 +177,20 @@ public class CarController : MonoBehaviour
     }
   }
 
+  public void StartGame()
+  {
+    homeScreenParent.SetActive(false);
+
+    startTime = Time.time;
+    Time.timeScale = 1;
+
+    highScoreText.text = "HighScore: " + formatTime(PlayerPrefs.GetFloat("HighScore"));
+    SetCountText();
+  }
+
   public void RestartGame()
   {
     SceneManager.LoadScene(0);
-    Time.timeScale = 1;
   }
 
   void SetCountText()
