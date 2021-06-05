@@ -23,13 +23,17 @@ public class CarController : MonoBehaviour
   private float emissionRate;
 
   private int count;
+  private float startTime;
+  private bool gameFinished;
   public TextMeshProUGUI countText;
+  public TextMeshProUGUI timerText;
 
   // Start is called before the first frame update
   void Start()
   {
     theRB.transform.parent = null;
     count = 0;
+    startTime = Time.time;
 
     SetCountText();
   }
@@ -66,6 +70,7 @@ public class CarController : MonoBehaviour
     // car's position == sphere's position
     transform.position = theRB.transform.position;
 
+    SetTimerText();
   }
 
   private void FixedUpdate()
@@ -108,9 +113,36 @@ public class CarController : MonoBehaviour
     }
   }
 
+  void SetTimerText()
+  {
+    if (gameFinished) return;
+
+    float timeSinceTimerStart = Time.time - startTime;
+    string minutes = ((int)timeSinceTimerStart / 60).ToString();
+    string seconds = (timeSinceTimerStart % 60).ToString("f0");
+    string milliSeconds = (((timeSinceTimerStart % 60) * 100) % 100).ToString("f0");
+
+    timerText.text = padZero(minutes) + ":" + padZero(seconds) + ":" + padZero(milliSeconds);
+  }
+
+  string padZero(string a)
+  {
+    if (a.Length == 1)
+    {
+      a = "0" + a;
+    }
+    return a;
+  }
+
   void SetCountText()
   {
     countText.text = "Stars: " + count + "/6";
+
+    if (count >= 6)
+    {
+      gameFinished = true;
+      timerText.color = Color.yellow;
+    }
   }
 
   private void OnTriggerEnter(Collider other)
