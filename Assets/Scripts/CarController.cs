@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class CarController : MonoBehaviour
 {
@@ -21,10 +22,16 @@ public class CarController : MonoBehaviour
   public float maxEmission = 25f;
   private float emissionRate;
 
+  private int count;
+  public TextMeshProUGUI countText;
+
   // Start is called before the first frame update
   void Start()
   {
     theRB.transform.parent = null;
+    count = 0;
+
+    SetCountText();
   }
 
   // Update is called once per frame
@@ -101,12 +108,20 @@ public class CarController : MonoBehaviour
     }
   }
 
+  void SetCountText()
+  {
+    countText.text = "Stars: " + count + "/6";
+  }
+
   private void OnTriggerEnter(Collider other)
   {
     Debug.Log("YO");
     if (other.gameObject.CompareTag("PickUp"))
     {
       other.gameObject.SetActive(false);
+      count++;
+
+      SetCountText();
     }
   }
 }
