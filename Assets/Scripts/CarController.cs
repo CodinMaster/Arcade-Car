@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class CarController : MonoBehaviour
 {
@@ -30,6 +31,13 @@ public class CarController : MonoBehaviour
   public TextMeshProUGUI timerText;
   public TextMeshProUGUI highScoreText;
 
+  //-- GameOver--
+  public GameObject gameOverParent;
+  public GameObject newHighScore;
+  public TextMeshProUGUI overScoreText;
+
+
+
   // Start is called before the first frame update
   void Start()
   {
@@ -37,6 +45,8 @@ public class CarController : MonoBehaviour
     count = 0;
     startTime = Time.time;
     highScoreText.text = "HighScore: " + formatTime(PlayerPrefs.GetFloat("HighScore"));
+    gameOverParent.SetActive(false);
+    newHighScore.SetActive(false);
 
     SetCountText();
   }
@@ -142,22 +152,43 @@ public class CarController : MonoBehaviour
     return a;
   }
 
+  void GameOver()
+  {
+    gameFinished = true;
+    Time.timeScale = 0;
+
+    gameOverParent.SetActive(true);
+    highScoreText.text = "";
+    countText.text = "";
+    timerText.text = "";
+
+    overScoreText.text = formatTime(timeSinceTimerStart);
+
+    if (PlayerPrefs.GetFloat("HighScore") == 0 || timeSinceTimerStart < PlayerPrefs.GetFloat("HighScore"))
+    {
+      PlayerPrefs.SetFloat("HighScore", timeSinceTimerStart);
+      newHighScore.SetActive(true);
+    }
+  }
+
+  public void RestartGame()
+  {
+    SceneManager.LoadScene(0);
+    Time.timeScale = 1;
+  }
+
   void SetCountText()
   {
     countText.text = "Stars: " + count + "/6";
 
     if (count >= 6)
     {
-      gameFinished = true;
-      timerText.color = Color.yellow;
-
-      PlayerPrefs.SetFloat("HighScore", timeSinceTimerStart);
+      GameOver();
     }
   }
 
   private void OnTriggerEnter(Collider other)
   {
-    Debug.Log("YO");
     if (other.gameObject.CompareTag("PickUp"))
     {
       other.gameObject.SetActive(false);
