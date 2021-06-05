@@ -100,4 +100,13 @@ public class CarController : MonoBehaviour
       emissionModule.rateOverTime = emissionRate;
     }
   }
+
+  private void OnTriggerEnter(Collider other)
+  {
+    Debug.Log("YO");
+    if (other.gameObject.CompareTag("PickUp"))
+    {
+      other.gameObject.SetActive(false);
+    }
+  }
 }
