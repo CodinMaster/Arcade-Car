@@ -25,8 +25,10 @@ public class CarController : MonoBehaviour
   private int count;
   private float startTime;
   private bool gameFinished;
+  private float timeSinceTimerStart;
   public TextMeshProUGUI countText;
   public TextMeshProUGUI timerText;
+  public TextMeshProUGUI highScoreText;
 
   // Start is called before the first frame update
   void Start()
@@ -34,6 +36,7 @@ public class CarController : MonoBehaviour
     theRB.transform.parent = null;
     count = 0;
     startTime = Time.time;
+    highScoreText.text = "HighScore: " + formatTime(PlayerPrefs.GetFloat("HighScore"));
 
     SetCountText();
   }
@@ -117,12 +120,17 @@ public class CarController : MonoBehaviour
   {
     if (gameFinished) return;
 
-    float timeSinceTimerStart = Time.time - startTime;
-    string minutes = ((int)timeSinceTimerStart / 60).ToString();
-    string seconds = (timeSinceTimerStart % 60).ToString("f0");
-    string milliSeconds = (((timeSinceTimerStart % 60) * 100) % 100).ToString("f0");
+    timeSinceTimerStart = Time.time - startTime;
+    timerText.text = formatTime(timeSinceTimerStart);
+  }
 
-    timerText.text = padZero(minutes) + ":" + padZero(seconds) + ":" + padZero(milliSeconds);
+  string formatTime(float time)
+  {
+    string minutes = ((int)time / 60).ToString();
+    string seconds = (time % 60).ToString("f0");
+    string milliSeconds = (((time % 60) * 100) % 100).ToString("f0");
+
+    return padZero(minutes) + ":" + padZero(seconds) + ":" + padZero(milliSeconds);
   }
 
   string padZero(string a)
@@ -142,6 +150,8 @@ public class CarController : MonoBehaviour
     {
       gameFinished = true;
       timerText.color = Color.yellow;
+
+      PlayerPrefs.SetFloat("HighScore", timeSinceTimerStart);
     }
   }
 
